@@ -68,7 +68,7 @@ ${JSON.stringify(products.map(p => ({ id: p.id, ad: p.name, kategori: p.category
       },
     });
 
-    const resultText = response.text();
+    const resultText = response.text;
     
     if (!resultText) {
        throw new Error("Empty response from AI");
