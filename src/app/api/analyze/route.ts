@@ -71,13 +71,25 @@ ${JSON.stringify(products.map(p => ({ id: p.id, ad: p.name, kategori: p.category
     const resultText = response.text;
     
     if (!resultText) {
+       console.error("Empty response from AI");
        throw new Error("Empty response from AI");
     }
-
+    
+    console.log("AI Yanıtı Başarıyla Alındı.");
     return NextResponse.json(JSON.parse(resultText));
-
   } catch (error: any) {
-    console.error("AI Analysis Error:", error);
-    return NextResponse.json({ error: "Analiz sırasında bir hata oluştu." }, { status: 500 });
+    console.error("Yapay Zeka API Hatası:", error);
+    
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: "Vercel üzerinde GEMINI_API_KEY eksik! Lütfen Vercel panelinden Environment Variables kısmına API anahtarınızı ekleyin." },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Analiz sırasında bir hata oluştu. Lütfen tekrar deneyin.", details: error.message },
+      { status: 500 }
+    );
   }
 }

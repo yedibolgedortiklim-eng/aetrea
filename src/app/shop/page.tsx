@@ -124,11 +124,11 @@ export default function ShopPage() {
                   <div style={{ padding: "2rem", display: "flex", flexDirection: "column", flex: 1 }}>
                     <h3 style={{ fontSize: "1.4rem", color: "var(--foreground)", marginBottom: "0.8rem", lineHeight: 1.3 }}>{product.name}</h3>
                     <p style={{ color: "var(--accent)", fontSize: "0.95rem", lineHeight: 1.6, flex: 1 }}>
-                      {product.desc}
+                      {product.description}
                     </p>
                     
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "2rem", paddingTop: "1.5rem", borderTop: "1px solid var(--border)" }}>
-                      <span style={{ fontSize: "1.6rem", fontWeight: "bold", color: "var(--primary-dark)" }}>{product.price}</span>
+                      <span style={{ fontSize: "1.6rem", fontWeight: "bold", color: "var(--primary-dark)" }}>{product.price} ₺</span>
                       <button style={{ 
                         padding: "0.8rem 1.8rem", 
                         backgroundColor: hoveredProduct === product.id ? "var(--primary)" : "var(--surface)", 
