@@ -1,0 +1,95 @@
+:root {
+  --background: #fbfbf9;
+  --foreground: #1c2b23;
+  
+  /* Aetera Brand Colors */
+  --primary: #285141; /* Deep Emerald Green */
+  --primary-light: #3e735e;
+  --primary-dark: #1b392d;
+  
+  --secondary: #cba365; /* Gold / Bronze */
+  --secondary-light: #e6c894;
+  --secondary-dark: #9e7a41;
+  
+  --accent: #875c36; /* Earthy Brown */
+  --accent-light: #b38458;
+  
+  --surface: #ffffff;
+  --surface-hover: #f4f5f0;
+  --border: #e2e8f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d1410;
+    --foreground: #f4f5f0;
+    
+    --primary: #336953;
+    --primary-light: #47886d;
+    --primary-dark: #1b392d;
+    
+    --secondary: #d6b47c;
+    --secondary-light: #edd8b0;
+    --secondary-dark: #b89354;
+    
+    --accent: #9a6d45;
+    --accent-light: #c29871;
+    
+    --surface: #17221c;
+    --surface-hover: #1f2e26;
+    --border: #2a3f34;
+  }
+}
+
+html {
+  height: 100%;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  color: var(--foreground);
+  background: var(--background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+/* Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .glass {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+}
