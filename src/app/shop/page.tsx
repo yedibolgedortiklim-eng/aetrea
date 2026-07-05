@@ -2,10 +2,10 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, ShoppingBag, Filter, ChevronRight, Sparkles, AlertCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowLeft, ShoppingBag, Filter, ChevronRight, Sparkles, AlertCircle, Volume2, VolumeX, Moon, Shield, Sun } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { products } from "@/lib/products";
-import { loadElementProfile, elementConfig, ElementProfile } from "@/lib/element-profile";
+import { loadElementProfile, elementConfig, ElementProfile, getCosmicSynergy } from "@/lib/element-profile";
 
 interface MoodDetail {
   emoji: string;
@@ -87,13 +87,16 @@ export default function ShopPage() {
   const [selectedMood, setSelectedMood] = useState<string>("all");
   const [elementProfile, setElementProfile] = useState<ElementProfile | null>(null);
   const [showElementBanner, setShowElementBanner] = useState(true);
+  
+  // Ambient Sound State
+  const [isPlayingSound, setIsPlayingSound] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // localStorage okuması
   useEffect(() => {
     const profile = loadElementProfile();
     if (profile) {
       setElementProfile(profile);
-      // Profilin element tipine göre bir başlangıç modu önerebiliriz
       if (profile.element === "Su") setSelectedMood("skin");
       if (profile.element === "Ates") setSelectedMood("stressed");
       if (profile.element === "Hava") setSelectedMood("sick");
@@ -101,37 +104,92 @@ export default function ShopPage() {
     }
   }, []);
 
+  // Ambient Audio player başlatma
+  useEffect(() => {
+    audioRef.current = new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-84.wav"); // Temsili sakin su/doğa efekti
+    if (audioRef.current) {
+      audioRef.current.loop = true;
+      audioRef.current.volume = 0.3; // Hafif arka plan sesi
+    }
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  const toggleSound = () => {
+    if (!audioRef.current) return;
+    if (isPlayingSound) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch((err) => console.log("Müzik çalma hatası:", err));
+    }
+    setIsPlayingSound(!isPlayingSound);
+  };
+
   // Filtreleme mantığı
   const filteredProducts = products.filter((product) => {
-    // 1. Kategori Filtresi
     const matchesCategory = activeCategory === "Tümü" || product.category === activeCategory;
-
-    // 2. Ruh Hali / Mood Filtresi
     const selectedMoodTags = moods[selectedMood]?.tags || [];
     const matchesMood =
       selectedMood === "all" ||
       product.tags.some((tag) => selectedMoodTags.includes(tag));
-
     return matchesCategory && matchesMood;
   });
 
   const currentElement = elementProfile?.element;
   const config = currentElement ? elementConfig[currentElement] : null;
 
+  // Kozmik Uyum Hesaplama
+  const cosmicSynergy = currentElement ? getCosmicSynergy(currentElement) : null;
+
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#0d1f16", color: "white", paddingTop: "6rem", paddingBottom: "4rem" }}>
+      
       {/* Header */}
       <header style={{ position: "fixed", top: 0, left: 0, width: "100%", padding: "1.5rem 4rem", background: "rgba(13, 31, 22, 0.95)", backdropFilter: "blur(15px)", zIndex: 100, borderBottom: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "rgba(255,255,255,0.8)", fontWeight: "bold", textDecoration: "none" }}>
           <ArrowLeft size={20} /> AETERA KLİNİK
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
+        
+        {/* Ortam Müziği Kontrolü */}
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <button 
+            onClick={toggleSound}
+            style={{
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              color: isPlayingSound ? "#a8d48a" : "white",
+              padding: "0.5rem 1rem",
+              borderRadius: "30px",
+              cursor: "pointer",
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              display: "flex",
+              alignItems: "center",
+              gap: "0.4rem",
+              transition: "all 0.3s"
+            }}
+          >
+            {isPlayingSound ? (
+              <>
+                <Volume2 size={16} /> Ambient Müzik Açık
+              </>
+            ) : (
+              <>
+                <VolumeX size={16} /> Ambient Müzik Kapalı
+              </>
+            )}
+          </button>
+
           {elementProfile && currentElement && (
             <div style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", padding: "0.4rem 1rem", borderRadius: "20px", display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.85rem" }}>
               <span>{config?.icon}</span>
               <span style={{ color: "#c9a44a", fontWeight: "bold" }}>{currentElement} Elementi</span>
             </div>
           )}
+          
           <a href="https://www.aktardepo.com" target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: "0.5rem", color: "white", fontWeight: "bold", textDecoration: "none", background: "#c9a44a", padding: "0.5rem 1.2rem", borderRadius: "30px", fontSize: "0.9rem" }}>
             <ShoppingBag size={18} /> Aktardepo Giriş
           </a>
@@ -139,7 +197,8 @@ export default function ShopPage() {
       </header>
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "0 2rem" }}>
-        {/* Element Profil Banner'ı */}
+        
+        {/* Element Profil Banner & Kozmik Uyum Paneli */}
         <AnimatePresence>
           {elementProfile && currentElement && showElementBanner && config && (
             <motion.div
@@ -149,36 +208,78 @@ export default function ShopPage() {
               style={{
                 background: config.gradient,
                 border: `1px solid ${config.color}66`,
-                borderRadius: "24px",
-                padding: "2rem",
+                borderRadius: "28px",
+                padding: "2.5rem",
                 marginBottom: "3rem",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "2rem",
                 position: "relative",
                 overflow: "hidden",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.2)",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
               }}
             >
-              <div style={{ display: "flex", gap: "1.5rem", alignItems: "center" }}>
-                <span style={{ fontSize: "3.5rem" }}>{config.icon}</span>
-                <div>
-                  <h3 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: "0.4rem", color: "white" }}>
-                    Hoş Geldiniz! Dominant Elementiniz: {currentElement}
-                  </h3>
-                  <p style={{ color: "rgba(255,255,255,0.85)", fontSize: "1rem", lineHeight: 1.5 }}>
-                    {config.description}. Mağaza ve ruh hali filtreleriniz elementinize göre optimize edildi.
+              {/* Sol Soluk Mandala Glow Arkası */}
+              <div style={{ position: "absolute", right: "-10%", top: "-10%", fontSize: "12rem", opacity: 0.1, pointerEvents: "none" }}>{config.icon}</div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "3rem", alignItems: "start" }}>
+                
+                {/* Element Bilgileri ve Ritüel */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                  <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+                    <span style={{ fontSize: "3.5rem" }}>{config.icon}</span>
+                    <div>
+                      <h3 style={{ fontSize: "1.7rem", fontWeight: 700, color: "white", marginBottom: "0.3rem" }}>
+                        Element Uyumunuz: {currentElement}
+                      </h3>
+                      <p style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.9rem", fontStyle: "italic" }}>
+                        Mantra: "{config.mantra}"
+                      </p>
+                    </div>
+                  </div>
+
+                  <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "1.05rem", lineHeight: 1.6 }}>
+                    {config.description} Sizin için özel filtrelenmiş ürün listesi aşağıdadır.
                   </p>
+
+                  {/* Ritüeller */}
+                  <div style={{ marginTop: "1rem" }}>
+                    <h4 style={{ color: "#c9a44a", fontSize: "1rem", fontWeight: 700, marginBottom: "0.8rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                      🌿 Günlük Element Ritüeliniz
+                    </h4>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+                      {config.rituals.map((r, i) => (
+                        <div key={i} style={{ background: "rgba(0,0,0,0.2)", padding: "0.8rem 1.2rem", borderRadius: "14px", fontSize: "0.88rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ color: "#a8d48a", fontWeight: "bold", width: "100px" }}>{r.time}:</span>
+                          <span style={{ flex: 1, color: "rgba(255,255,255,0.85)" }}>{r.activity}</span>
+                          <span style={{ color: "#c9a44a", fontSize: "0.78rem", background: "rgba(201,164,74,0.1)", padding: "0.2rem 0.6rem", borderRadius: "8px", marginLeft: "1rem" }}>{r.recommendedProduct}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div style={{ display: "flex", gap: "1rem", flexShrink: 0 }}>
-                <Link href="/analysis" style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "white", padding: "0.7rem 1.3rem", borderRadius: "25px", textDecoration: "none", fontSize: "0.85rem", fontWeight: 700 }}>
-                  Analizi Güncelle
-                </Link>
-                <button onClick={() => setShowElementBanner(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.6)", cursor: "pointer", fontSize: "0.9rem" }}>
-                  Kapat
-                </button>
+
+                {/* Kozmik Synergy Kartı */}
+                {cosmicSynergy && (
+                  <div style={{ background: "rgba(0,0,0,0.25)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "20px", padding: "1.8rem", display: "flex", flexDirection: "column", gap: "1.2rem", height: "100%" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                      <Moon size={20} color="#c9a44a" />
+                      <h4 style={{ fontSize: "1.1rem", fontWeight: 700, color: "white" }}>Kozmik Uyum & Synergy</h4>
+                    </div>
+                    <div style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#a8d48a" }}>
+                      {cosmicSynergy.title}
+                    </div>
+                    <p style={{ fontSize: "0.88rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.5 }}>
+                      {cosmicSynergy.desc}
+                    </p>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "auto", borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: "1rem" }}>
+                      <Link href="/analysis" style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", color: "white", padding: "0.5rem 1.2rem", borderRadius: "20px", textDecoration: "none", fontSize: "0.8rem", fontWeight: 600 }}>
+                        Yeniden Analiz Yap
+                      </Link>
+                      <button onClick={() => setShowElementBanner(false)} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", cursor: "pointer", fontSize: "0.85rem" }}>
+                        Paneli Gizle
+                      </button>
+                    </div>
+                  </div>
+                )}
+
               </div>
             </motion.div>
           )}
@@ -344,6 +445,33 @@ export default function ShopPage() {
               <AnimatePresence mode="popLayout">
                 {filteredProducts.map((product) => {
                   const activeMoodTags = moods[selectedMood]?.tags || [];
+                  
+                  // Element Afinite Skoru (Uyum Skoru) Hesaplama
+                  let affinityScore = 50; // default 50%
+                  let isPreferred = false;
+                  
+                  if (currentElement) {
+                    const elConfig = elementConfig[currentElement];
+                    
+                    // Ürün element tags'lerinden birini içeriyorsa veya mood eşleşmesi varsa
+                    const matchesElementTags = product.tags.some(tag => elConfig.moodTags.includes(tag));
+                    const matchesActiveMood = product.tags.some(tag => activeMoodTags.includes(tag));
+                    
+                    if (matchesElementTags) {
+                      affinityScore = 80;
+                      isPreferred = true;
+                    }
+                    if (matchesActiveMood) {
+                      affinityScore += 10;
+                    }
+                    if (cosmicSynergy) {
+                      affinityScore += cosmicSynergy.affinityModifier;
+                    }
+                    
+                    // Max 99% sınırla
+                    affinityScore = Math.min(Math.max(affinityScore, 10), 99);
+                  }
+
                   return (
                     <motion.div
                       layout
@@ -354,14 +482,22 @@ export default function ShopPage() {
                       transition={{ duration: 0.3 }}
                       style={{
                         backgroundColor: "rgba(255,255,255,0.02)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        border: isPreferred ? "1px solid rgba(201, 164, 74, 0.3)" : "1px solid rgba(255,255,255,0.08)",
                         borderRadius: "24px",
                         overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
                         height: "100%",
+                        position: "relative"
                       }}
                     >
+                      {/* Element Uyum Rozeti */}
+                      {currentElement && isPreferred && (
+                        <div style={{ position: "absolute", top: "1rem", right: "1rem", backgroundColor: "rgba(201,164,74,0.9)", backdropFilter: "blur(5px)", color: "#0d1f16", padding: "0.3rem 0.7rem", borderRadius: "12px", fontSize: "0.72rem", fontWeight: "bold", zIndex: 10, display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                          <Shield size={10} /> %{affinityScore} Element Uyumu
+                        </div>
+                      )}
+
                       {/* Görsel Alanı */}
                       <div style={{ height: "240px", position: "relative", overflow: "hidden", backgroundColor: "rgba(0,0,0,0.15)" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}

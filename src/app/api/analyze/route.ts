@@ -2,11 +2,18 @@ import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { NextResponse } from "next/server";
 import { products } from "@/lib/products";
 
-// Initialize the SDK. It automatically picks up GEMINI_API_KEY from environment.
-const ai = new GoogleGenAI({});
-
 export async function POST(req: Request) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY is not defined in environment variables.");
+      return NextResponse.json(
+        { error: "Vercel üzerinde GEMINI_API_KEY eksik! Lütfen Vercel panelinden Environment Variables kısmına API anahtarınızı ekleyin." },
+        { status: 500 }
+      );
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
     const body = await req.json();
     const { moduleType, tags, userAnswers } = body;
 
