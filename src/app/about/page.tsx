@@ -28,7 +28,7 @@ export default function AboutPage() {
             width: "100%", 
             borderRadius: "30px", 
             marginBottom: "3rem",
-            backgroundImage: "url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=2574&auto=format&fit=crop')",
+            backgroundImage: "url('https://images.unsplash.com/photo-1551020088-7253509b5ca0?w=2574&auto=format&fit=crop')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             boxShadow: "0 20px 40px rgba(0,0,0,0.1)"

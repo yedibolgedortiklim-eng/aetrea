@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, ShoppingBag, Filter, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import Image from "next/image";
 
 const mockProducts = [
   { 
@@ -13,7 +12,7 @@ const mockProducts = [
     category: "Aromaterapi", 
     price: "245 ₺", 
     desc: "Fransız Alplerinden elde edilen premium kalite. Sakinleştirici ve rahatlatıcı etkisiyle uyku kalitenizi derinleştirir.",
-    image: "https://images.unsplash.com/photo-1595806611388-c70f089e9006?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1611078816997-7e61f22490cc?w=800&auto=format&fit=crop"
   },
   { 
     id: 2, 
@@ -21,7 +20,7 @@ const mockProducts = [
     category: "Cilt Bakımı", 
     price: "320 ₺", 
     desc: "A Vitamini deposu. Anti-aging etkisiyle cildi yeniler, ince çizgilerin ve lekelerin görünümünü kusursuzca azaltır.",
-    image: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1615397323136-1e35e3962635?w=800&auto=format&fit=crop"
   },
   { 
     id: 3, 
@@ -29,7 +28,7 @@ const mockProducts = [
     category: "Cilt Bakımı", 
     price: "150 ₺", 
     desc: "Geleneksel bakır imbiklerde damıtılmış %100 saf gül suyu. Cildin pH dengesini korur, gözenekleri sıkılaştırır.",
-    image: "https://images.unsplash.com/photo-1559564114-569b04cb81e4?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?w=800&auto=format&fit=crop"
   },
   { 
     id: 4, 
@@ -45,7 +44,7 @@ const mockProducts = [
     category: "Şifa & Bağışıklık", 
     price: "120 ₺", 
     desc: "Organik papatya, melisa ve lavanta içeren özel stres karşıtı harman. Günün yorgunluğunu silmek için ideal.",
-    image: "https://images.unsplash.com/photo-1563914946356-068307ce3c99?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1576092762791-dd9e2220abd4?w=800&auto=format&fit=crop"
   },
   { 
     id: 6, 
@@ -53,7 +52,7 @@ const mockProducts = [
     category: "Aromaterapi", 
     price: "190 ₺", 
     desc: "Zihni anında açan, odaklanmayı artıran ve ortamın enerjisini tazeleyen yoğun ferahlık.",
-    image: "https://images.unsplash.com/photo-1620241078736-22a3d75a6f87?w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1582298687702-0e24ec140cfa?w=800&auto=format&fit=crop"
   },
 ];
 
@@ -124,8 +123,8 @@ export default function ShopPage() {
             transition={{ duration: 0.8 }}
           >
             <div style={{ marginBottom: "3rem" }}>
-              <h1 style={{ fontSize: "3.5rem", color: "var(--primary-dark)", marginBottom: "0.5rem", lineHeight: 1.1 }}>Doğal Eczane</h1>
-              <p style={{ color: "var(--accent)", fontSize: "1.2rem", maxWidth: "600px" }}>Saf, etik ve güçlü. Doğanın kalbinden formüle edilmiş premium seçkiyi keşfedin.</p>
+              <h1 style={{ fontSize: "3.5rem", color: "var(--primary-dark)", marginBottom: "0.5rem", lineHeight: 1.1 }}>Doğal Eczane (Aktar)</h1>
+              <p style={{ color: "var(--accent)", fontSize: "1.2rem", maxWidth: "600px" }}>Saf, etik ve güçlü. Kadim tıp öğretileriyle hazırlanan bitkisel şifa arşivi.</p>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "3rem" }}>
@@ -155,6 +154,7 @@ export default function ShopPage() {
                     position: "relative",
                     overflow: "hidden"
                   }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={product.image} 
                       alt={product.name} 

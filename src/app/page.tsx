@@ -1,184 +1,128 @@
 "use client";
 
-import { useState } from "react";
-import Intro from "../components/Intro";
 import { motion } from "framer-motion";
-import { Sparkles, HeartPulse, Activity } from "lucide-react";
 import Link from "next/link";
+import { Sparkles, Leaf, Activity } from "lucide-react";
 
 export default function Home() {
-  const [introComplete, setIntroComplete] = useState(false);
-
   return (
-    <main style={{ minHeight: "100vh", position: "relative" }}>
-      {!introComplete && <Intro onComplete={() => setIntroComplete(true)} />}
+    <div style={{ backgroundColor: "var(--primary-dark)", minHeight: "100vh", color: "var(--background)", overflow: "hidden" }}>
+      
+      {/* Header */}
+      <header style={{ position: "fixed", top: 0, left: 0, width: "100%", padding: "2rem 4rem", zIndex: 100, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ fontSize: "1.5rem", fontWeight: "bold", letterSpacing: "0.2em", color: "white" }}>
+          AETERA
+        </div>
+        <nav style={{ display: "flex", gap: "3rem" }}>
+          <Link href="/shop" style={{ color: "white", textDecoration: "none", fontWeight: 500, opacity: 0.9 }}>Mağaza</Link>
+          <Link href="/analysis" style={{ color: "white", textDecoration: "none", fontWeight: 500, opacity: 0.9 }}>Yapay Zeka Analizi</Link>
+          <Link href="/about" style={{ color: "white", textDecoration: "none", fontWeight: 500, opacity: 0.9 }}>Hakkımızda</Link>
+        </nav>
+      </header>
 
-      {introComplete && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
+      {/* Hero with Video */}
+      <div style={{ position: "relative", width: "100%", height: "70vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+        {/* Video Background */}
+        <video 
+          autoPlay 
+          controls 
+          loop 
+          playsInline 
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            minWidth: "100%",
+            minHeight: "100%",
+            width: "auto",
+            height: "auto",
+            zIndex: 0,
+            objectFit: "cover",
+            opacity: 0.8
+          }}
         >
-          {/* Header */}
-          <header style={{ 
-            padding: "2rem 4rem", 
-            display: "flex", 
-            justifyContent: "space-between", 
-            alignItems: "center",
-            position: "fixed",
-            width: "100%",
-            zIndex: 100,
-            background: "rgba(251, 251, 249, 0.8)",
-            backdropFilter: "blur(12px)",
-            borderBottom: "1px solid var(--border)"
-          }}>
-            <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: "var(--primary)", letterSpacing: "0.1em" }}>
-              AETERA
-            </div>
-            <nav style={{ display: "flex", gap: "2rem", color: "var(--foreground)", fontWeight: 500 }}>
-              <Link href="/shop" style={{ transition: "color 0.3s" }}>Mağaza</Link>
-              <Link href="/analysis" style={{ transition: "color 0.3s" }}>Yapay Zeka Analizi</Link>
-              <Link href="/about" style={{ transition: "color 0.3s" }}>Hakkımızda</Link>
-            </nav>
-            <div>
-              <button style={{ 
-                padding: "0.75rem 1.5rem", 
-                backgroundColor: "var(--primary)", 
-                color: "white", 
-                border: "none", 
-                borderRadius: "30px",
-                fontWeight: "bold",
-                cursor: "pointer",
-                transition: "background-color 0.3s"
-              }}>
-                Giriş Yap
-              </button>
-            </div>
-          </header>
+          <source src="/hero-video.mp4" type="video/mp4" />
+          Tarayıcınız video etiketini desteklemiyor.
+        </video>
 
-          {/* Hero Section */}
-          <section style={{ 
-            height: "100vh", 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center",
-            background: "radial-gradient(circle at top right, var(--surface-hover), var(--background))",
-            paddingTop: "5rem"
-          }}>
-            <div style={{ textAlign: "center", maxWidth: "800px", padding: "0 2rem" }}>
-              <motion.div
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
-                style={{ 
-                  display: "inline-block", 
-                  padding: "0.5rem 1.5rem", 
-                  borderRadius: "30px", 
-                  backgroundColor: "rgba(203, 163, 101, 0.15)",
-                  color: "var(--secondary-dark)",
-                  fontWeight: "bold",
-                  marginBottom: "1.5rem",
-                  letterSpacing: "0.05em"
-                }}
-              >
-                Yüzyılın Şifa Platformuna Hoş Geldiniz
-              </motion.div>
-              
-              <motion.h1
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                style={{ fontSize: "4.5rem", color: "var(--foreground)", lineHeight: 1.1, marginBottom: "1.5rem" }}
-              >
-                Doğanın Zamansız Özüyle <br/>
-                <span style={{ color: "var(--primary)" }}>Kendinizi Keşfedin</span>
-              </motion.h1>
-              
-              <motion.p
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-                style={{ fontSize: "1.2rem", color: "var(--accent)", marginBottom: "3rem", lineHeight: 1.6 }}
-              >
-                Kadim bilgeliğin ve modern bilimin ışığında, yapay zeka destekli 
-                kişiselleştirilmiş şifa, cilt ve ruh analizi ile eşsiz bir alışveriş deneyimi yaşayın.
-              </motion.p>
-              
-              <motion.div
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-                style={{ display: "flex", gap: "1.5rem", justifyContent: "center" }}
-              >
-                <Link href="/analysis" style={{
-                  padding: "1rem 2.5rem",
-                  backgroundColor: "var(--primary)",
-                  color: "white",
-                  borderRadius: "30px",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                  textDecoration: "none",
-                  boxShadow: "0 10px 25px rgba(40, 81, 65, 0.3)",
-                  transition: "transform 0.3s ease"
-                }}>
-                  Analize Başla
-                </Link>
-                <Link href="/shop" style={{
-                  padding: "1rem 2.5rem",
-                  backgroundColor: "transparent",
-                  color: "var(--primary)",
-                  border: "2px solid var(--primary)",
-                  borderRadius: "30px",
-                  fontSize: "1.1rem",
-                  fontWeight: "bold",
-                  textDecoration: "none",
-                  transition: "all 0.3s ease"
-                }}>
-                  Mağazayı Keşfet
-                </Link>
-              </motion.div>
-            </div>
-          </section>
+        {/* Overlay to ensure text readability */}
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(27, 57, 45, 0.4)", // Dark green overlay
+          zIndex: 1
+        }}></div>
 
-          {/* AI Features Section */}
-          <section style={{ padding: "8rem 4rem", backgroundColor: "var(--primary-dark)", color: "white" }}>
-             <div style={{ textAlign: "center", marginBottom: "5rem" }}>
-                <h2 style={{ fontSize: "3rem", color: "var(--secondary-light)" }}>Yapay Zeka Destekli Şifa Rehberiniz</h2>
-                <p style={{ marginTop: "1.5rem", color: "rgba(255,255,255,0.8)", maxWidth: "700px", margin: "1.5rem auto 0", fontSize: "1.1rem", lineHeight: 1.6 }}>
-                  Sizi dinleyen, anlayan ve bedensel, ruhsal ihtiyaçlarınıza en uygun doğadan gelen çözümleri öneren akıllı asistanlar.
-                </p>
-             </div>
-             
-             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "3rem", maxWidth: "1200px", margin: "0 auto" }}>
-                {[
-                  { icon: <Activity size={40} />, title: "Bedensel Şifa", desc: "Şikayetlerinizi dinleyip, kadim ve modern tıbba göre bitkisel kür tavsiyeleri verir. Tamamen doğal destek." },
-                  { icon: <Sparkles size={40} />, title: "Kişilik & Ruh", desc: "Ruh halinize uygun rahatlatıcı aromaterapi ve doğal ürünleri eşleştirerek içsel dengenizi sağlar." },
-                  { icon: <HeartPulse size={40} />, title: "Akıllı Cilt Analizi", desc: "Cilt tipinize ve özel problemlerinize yönelik %100 doğal, bitkisel içerikli bakım rutini oluşturur." }
-                ].map((feature, i) => (
-                  <motion.div 
-                    key={i}
-                    whileHover={{ y: -15, scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                    style={{
-                      backgroundColor: "rgba(255,255,255,0.05)",
-                      padding: "3rem 2.5rem",
-                      borderRadius: "24px",
-                      border: "1px solid rgba(255,255,255,0.1)",
-                      backdropFilter: "blur(10px)",
-                      boxShadow: "0 20px 40px rgba(0,0,0,0.2)"
-                    }}
-                  >
-                    <div style={{ color: "var(--secondary)", marginBottom: "2rem", display: "inline-block", padding: "1rem", background: "rgba(203,163,101,0.1)", borderRadius: "50%" }}>
-                      {feature.icon}
-                    </div>
-                    <h3 style={{ fontSize: "1.8rem", marginBottom: "1rem", fontWeight: 600 }}>{feature.title}</h3>
-                    <p style={{ color: "rgba(255,255,255,0.7)", lineHeight: 1.7, fontSize: "1.05rem" }}>{feature.desc}</p>
-                  </motion.div>
-                ))}
-             </div>
-          </section>
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          style={{ position: "relative", zIndex: 2, textAlign: "center", maxWidth: "800px", padding: "0 2rem" }}
+        >
+          <h1 style={{ fontSize: "4.5rem", marginBottom: "1rem", lineHeight: 1.1, fontWeight: 300, color: "white", textShadow: "0 4px 20px rgba(0,0,0,0.5)" }}>
+            Doğanın <br/><span style={{ fontWeight: 600, color: "var(--secondary)" }}>Zamansız Özü</span>
+          </h1>
+          <p style={{ fontSize: "1.4rem", opacity: 0.9, marginBottom: "3rem", color: "white", textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
+            Bedeninize, ruhunuza ve cildinize iyi gelecek kadim formüller. Yapay zeka ile kişiselleştirilmiş şifa deneyimine başlayın.
+          </p>
         </motion.div>
-      )}
-    </main>
+      </div>
+
+      {/* Features / Analysis Cards */}
+      <div style={{ padding: "6rem 2rem", maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
+        <div style={{ textAlign: "center", marginBottom: "4rem" }}>
+          <p style={{ fontSize: "1.2rem", opacity: 0.8, color: "rgba(255,255,255,0.8)" }}>
+            Sizi dinleyen, anlayan ve bedensel, ruhsal ihtiyaçlarınıza en uygun doğadan gelen çözümleri öneren akıllı asistanlar.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem" }}>
+          
+          <Link href="/analysis" style={{ textDecoration: "none" }}>
+            <motion.div 
+              whileHover={{ y: -10, backgroundColor: "rgba(255,255,255,0.1)" }}
+              style={{ padding: "3rem", borderRadius: "24px", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <div style={{ width: "60px", height: "60px", borderRadius: "50%", backgroundColor: "rgba(203, 163, 101, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "2rem" }}>
+                <Activity color="var(--secondary)" size={30} />
+              </div>
+              <h3 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "white" }}>Bedensel Şifa</h3>
+              <p style={{ opacity: 0.7, lineHeight: 1.6, color: "white" }}>Şikayetlerinizi dinleyip, kadim ve modern tıbba göre bitkisel kür tavsiyeleri verir. Tamamen doğal destek.</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/analysis" style={{ textDecoration: "none" }}>
+            <motion.div 
+              whileHover={{ y: -10, backgroundColor: "rgba(255,255,255,0.1)" }}
+              style={{ padding: "3rem", borderRadius: "24px", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <div style={{ width: "60px", height: "60px", borderRadius: "50%", backgroundColor: "rgba(203, 163, 101, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "2rem" }}>
+                <Sparkles color="var(--secondary)" size={30} />
+              </div>
+              <h3 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "white" }}>Kişilik & Ruh</h3>
+              <p style={{ opacity: 0.7, lineHeight: 1.6, color: "white" }}>Ruh halinize uygun rahatlatıcı aromaterapi ve doğal ürünleri eşleştirerek içsel dengenizi sağlar.</p>
+            </motion.div>
+          </Link>
+
+          <Link href="/analysis" style={{ textDecoration: "none" }}>
+            <motion.div 
+              whileHover={{ y: -10, backgroundColor: "rgba(255,255,255,0.1)" }}
+              style={{ padding: "3rem", borderRadius: "24px", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
+            >
+              <div style={{ width: "60px", height: "60px", borderRadius: "50%", backgroundColor: "rgba(203, 163, 101, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "2rem" }}>
+                <Leaf color="var(--secondary)" size={30} />
+              </div>
+              <h3 style={{ fontSize: "1.8rem", marginBottom: "1rem", color: "white" }}>Akıllı Cilt Analizi</h3>
+              <p style={{ opacity: 0.7, lineHeight: 1.6, color: "white" }}>Cilt tipinize ve özel problemlerinize yönelik %100 doğal, bitkisel içerikli bakım rutini oluşturur.</p>
+            </motion.div>
+          </Link>
+
+        </div>
+      </div>
+    </div>
   );
 }
