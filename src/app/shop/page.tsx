@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ArrowLeft, ShoppingBag, Filter, ChevronRight, Sparkles, AlertCircle, Volume2, VolumeX, Moon, Shield, Sun } from "lucide-react";
+import { ArrowLeft, ShoppingBag, Filter, ChevronRight, Sparkles, AlertCircle, Volume2, VolumeX, Moon, Shield, Sun, Send, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { products } from "@/lib/products";
 import { loadElementProfile, elementConfig, ElementProfile, getCosmicSynergy } from "@/lib/element-profile";
@@ -88,6 +88,62 @@ export default function ShopPage() {
   const [elementProfile, setElementProfile] = useState<ElementProfile | null>(null);
   const [showElementBanner, setShowElementBanner] = useState(true);
   const [onlyElementUyumlu, setOnlyElementUyumlu] = useState(true);
+
+  // AI Şifa Odası (Sanctuary Chat) State
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{ role: "user" | "model"; text: string }[]>([]);
+  const [chatInput, setChatInput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+
+  const getInitialGreeting = (moodKey: string, element: string | null | undefined) => {
+    const elementStr = element ? `${element} Elementi` : "Bütünsel";
+    if (moodKey === "stressed") {
+      return `Hoş geldin ruhum. Bugün göğsünde bir sıkışma, zihninde bir fırtına (Ateş dengesizliği) hissettiğini seziyorum. Aetera ${elementStr} Şifa Asistanı olarak yanındayım. Derin bir nefes alıp vermeye hazır olduğunda bana seni neyin yorduğunu anlatmak ister misin?`;
+    }
+    if (moodKey === "tired") {
+      return `Hoş geldin. Bugün içindeki yaşam kıvılcımının hafifçe söndüğünü, Toprak elementinin ağırlığını taşıdığını hissediyorum. Aetera ${elementStr} Şifa Asistanı olarak yanındayım. Birlikte enerjini nazikçe uyandırabiliriz. Bana içindeki durumu tarif et...`;
+    }
+    if (moodKey === "sick") {
+      return `Sakin limana hoş geldin. Bedeninin şu an dinlenmeye, Hava ve Su elementlerinin arındırıcı gücüne ihtiyacı var. Aetera ${elementStr} Şifa Asistanı olarak yanındayım. Kendini hırpalama. Bugün nerenin şifaya ihtiyacı var?`;
+    }
+    if (moodKey === "skin") {
+      return `Cildinin sesini dinlemeye hoş geldin. Cilt, ruhunun dışa vuran aynasıdır. Aetera ${elementStr} Cilt Rehberi olarak yanındayım. Bugün cildindeki hassasiyeti veya dengesizliği birlikte konuşalım. Neler gözlemliyorsun?`;
+    }
+    return "Hoş geldin. Bugün ruh ve beden uyumunu kurmak için buradayız. Nasıl hissediyorsun?";
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim()) return;
+    const userText = chatInput;
+    setChatInput("");
+    const newMessages = [...chatMessages, { role: "user" as const, text: userText }];
+    setChatMessages(newMessages);
+    setIsTyping(true);
+
+    try {
+      const res = await fetch("/api/healing-chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mood: selectedMood,
+          element: elementProfile?.element,
+          messages: newMessages,
+        }),
+      });
+
+      if (!res.ok) throw new Error("API hatası");
+      const data = await res.json();
+      setChatMessages([...newMessages, { role: "model" as const, text: data.text }]);
+    } catch (err) {
+      console.error("Sohbet hatası:", err);
+      setChatMessages([
+        ...newMessages,
+        { role: "model" as const, text: "Karanlık bulutlar dağılırken bağlantımız koptu. Lütfen tekrar dener misiniz?" },
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
   
   // Ambient Sound State
   const [isPlayingSound, setIsPlayingSound] = useState(false);
@@ -338,7 +394,13 @@ export default function ShopPage() {
                   key={key}
                   whileHover={{ y: -5, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setSelectedMood(key)}
+                  onClick={() => {
+                    setSelectedMood(key);
+                    if (key !== "all") {
+                      setChatMessages([{ role: "model", text: getInitialGreeting(key, elementProfile?.element) }]);
+                      setIsChatOpen(true);
+                    }
+                  }}
                   style={{
                     background: isSelected ? "rgba(201, 164, 74, 0.12)" : "rgba(255,255,255,0.03)",
                     border: isSelected ? "2px solid #c9a44a" : "1px solid rgba(255,255,255,0.08)",
@@ -659,6 +721,255 @@ export default function ShopPage() {
           </div>
         </div>
       </div>
+
+      {/* AI Şifa & Olumlama Odası (Sanctuary Modal) */}
+      <AnimatePresence>
+        {isChatOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100vh",
+              background: "rgba(13, 31, 22, 0.95)",
+              backdropFilter: "blur(25px)",
+              zIndex: 1000,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              padding: "2rem",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: "800px",
+                height: "90vh",
+                background: "rgba(255, 255, 255, 0.03)",
+                border: "1px solid rgba(255, 255, 255, 0.08)",
+                borderRadius: "32px",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
+                boxShadow: "0 50px 100px rgba(0,0,0,0.6)",
+              }}
+            >
+              {/* Chat Header */}
+              <div
+                style={{
+                  padding: "1.5rem 2rem",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  background: "rgba(0,0,0,0.15)",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
+                  <span style={{ fontSize: "2rem" }}>{moods[selectedMood]?.emoji}</span>
+                  <div>
+                    <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "white", margin: 0 }}>
+                      Aetera Şifa & Olumlama Odası
+                    </h3>
+                    <p style={{ color: "#c9a44a", fontSize: "0.8rem", margin: 0 }}>
+                      Ruh Hali: {moods[selectedMood]?.label} {currentElement && `• Element: ${currentElement}`}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsChatOpen(false)}
+                  style={{
+                    background: "rgba(255, 255, 255, 0.08)",
+                    border: "none",
+                    borderRadius: "50%",
+                    width: "40px",
+                    height: "40px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: "white",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255, 255, 255, 0.08)")}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Breathing Guide Animation */}
+              <div
+                style={{
+                  padding: "1.2rem",
+                  background: "rgba(201, 164, 74, 0.05)",
+                  borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "2rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "0.8rem" }}>
+                  <motion.div
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
+                    transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      background: "#c9a44a",
+                      boxShadow: "0 0 15px #c9a44a",
+                    }}
+                  />
+                  <span style={{ fontSize: "0.88rem", color: "rgba(255, 255, 255, 0.8)", fontWeight: 500 }}>
+                    Nefes Döngüsü Aktif (Derin nefes alıp verin)
+                  </span>
+                </div>
+              </div>
+
+              {/* Messages Area */}
+              <div
+                style={{
+                  flex: 1,
+                  padding: "2rem",
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1.5rem",
+                }}
+              >
+                {chatMessages.map((msg, idx) => {
+                  const isUser = msg.role === "user";
+                  return (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      style={{
+                        display: "flex",
+                        justifyContent: isUser ? "flex-end" : "flex-start",
+                        width: "100%",
+                      }}
+                    >
+                      <div
+                        style={{
+                          maxWidth: "80%",
+                          padding: "1.1rem 1.4rem",
+                          borderRadius: isUser ? "22px 22px 4px 22px" : "22px 22px 22px 4px",
+                          background: isUser
+                            ? "linear-gradient(135deg, #2d5a27 0%, #1a3c17 100%)"
+                            : "rgba(255, 255, 255, 0.06)",
+                          border: isUser ? "1px solid rgba(168, 212, 138, 0.2)" : "1px solid rgba(255, 255, 255, 0.08)",
+                          color: "white",
+                          lineHeight: 1.6,
+                          fontSize: "0.95rem",
+                          whiteSpace: "pre-wrap",
+                          boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
+                        }}
+                      >
+                        {msg.text}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+
+                {isTyping && (
+                  <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                    <div
+                      style={{
+                        background: "rgba(255, 255, 255, 0.06)",
+                        padding: "1rem 1.5rem",
+                        borderRadius: "22px 22px 22px 4px",
+                        display: "flex",
+                        gap: "0.4rem",
+                        alignItems: "center",
+                      }}
+                    >
+                      <motion.span
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1, delay: 0 }}
+                        style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c9a44a" }}
+                      />
+                      <motion.span
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1, delay: 0.2 }}
+                        style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c9a44a" }}
+                      />
+                      <motion.span
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{ repeat: Infinity, duration: 1, delay: 0.4 }}
+                        style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#c9a44a" }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Chat Input Form */}
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSendMessage();
+                }}
+                style={{
+                  padding: "1.5rem 2rem",
+                  borderTop: "1px solid rgba(255, 255, 255, 0.08)",
+                  display: "flex",
+                  gap: "1rem",
+                  background: "rgba(0,0,0,0.15)",
+                }}
+              >
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="İçinizden geçenleri, tıkanıklıkları veya nasıl hissettiğinizi buraya yazın..."
+                  style={{
+                    flex: 1,
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "30px",
+                    padding: "1rem 1.5rem",
+                    color: "white",
+                    fontSize: "0.95rem",
+                    outline: "none",
+                    transition: "all 0.2s",
+                  }}
+                  onFocus={(e) => (e.target.style.borderColor = "#c9a44a")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(255, 255, 255, 0.12)")}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    width: "50px",
+                    height: "50px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #c9a44a 0%, #8b6914 100%)",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#0d1f16",
+                    cursor: "pointer",
+                    boxShadow: "0 10px 20px rgba(201,164,74,0.2)",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                >
+                  <Send size={18} />
+                </button>
+              </form>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
