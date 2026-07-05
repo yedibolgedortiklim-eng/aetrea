@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Sparkles, Leaf, Activity } from "lucide-react";
+import { useState, useEffect } from "react";
+import { loadElementProfile, elementConfig, ElementProfile } from "@/lib/element-profile";
 
 export default function Home() {
   return (
@@ -72,6 +74,9 @@ export default function Home() {
         </motion.div>
       </div>
 
+      {/* Returning User Element Profile Section */}
+      <ReturningUserSection />
+
       {/* Features / Analysis Cards */}
       <div style={{ padding: "6rem 2rem", maxWidth: "1200px", margin: "0 auto", position: "relative", zIndex: 2 }}>
         <div style={{ textAlign: "center", marginBottom: "4rem" }}>
@@ -126,3 +131,65 @@ export default function Home() {
     </div>
   );
 }
+
+function ReturningUserSection() {
+  const [profile, setProfile] = useState<ElementProfile | null>(null);
+
+  useEffect(() => {
+    setProfile(loadElementProfile());
+  }, []);
+
+  if (!profile || !profile.element) return null;
+
+  const config = elementConfig[profile.element];
+  if (!config) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      style={{
+        maxWidth: "900px",
+        margin: "4rem auto 0",
+        padding: "0 2rem",
+        zIndex: 2,
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          background: config.gradient,
+          border: `1px solid ${config.color}88`,
+          borderRadius: "28px",
+          padding: "2.5rem",
+          boxShadow: "0 20px 40px rgba(0,0,0,0.3)",
+          textAlign: "center",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "1.2rem",
+        }}
+      >
+        <span style={{ fontSize: "4rem" }}>{config.icon}</span>
+        <div>
+          <h2 style={{ fontSize: "1.8rem", fontWeight: 700, color: "white", marginBottom: "0.5rem" }}>
+            Tekrar Hoş Geldiniz!
+          </h2>
+          <p style={{ fontSize: "1.1rem", color: "rgba(255,255,255,0.9)", maxWidth: "600px", margin: "0 auto", lineHeight: 1.6 }}>
+            En son yaptığınız analize göre dominant elementiniz: <strong style={{ color: "#a8d48a" }}>{profile.element}</strong> ({config.description}).
+            Şifa yolculuğunuza kaldığınız yerden devam edebilirsiniz.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: "1rem", marginTop: "1rem", flexWrap: "wrap", justifyContent: "center" }}>
+          <Link href="/shop" style={{ background: "white", color: "#0d1f16", padding: "0.8rem 1.8rem", borderRadius: "30px", textDecoration: "none", fontWeight: 700, fontSize: "0.95rem" }}>
+            Kişisel Mağazama Git →
+          </Link>
+          <Link href="/analysis" style={{ background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.25)", color: "white", padding: "0.8rem 1.8rem", borderRadius: "30px", textDecoration: "none", fontWeight: 600, fontSize: "0.95rem" }}>
+            Yeni Analiz Yap
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, CheckCircle2, Loader2, AlertCircle, ShoppingBag, Leaf } from "lucide-react";
 import { scoreSkinAnalysis } from "@/lib/analysis-engine";
 import { products } from "@/lib/products";
+import { tagsToElement, saveElementProfile, elementConfig } from "@/lib/element-profile";
 
 // ─── 4 SORU — BAUMANN CİLT TİPİ ENVANTERİ ────────────────────────────────────
 const QUESTIONS = [
@@ -197,6 +198,9 @@ export default function SkinAnalysisPage() {
       setStep("loading");
       const profile = scoreSkinAnalysis(newAnswers);
       setSkinProfile(profile);
+      // 4 Element profilini hesapla ve kaydet
+      const element = tagsToElement(profile.primaryTags, "skin");
+      saveElementProfile({ element, moduleType: "skin", timestamp: Date.now(), primaryTags: profile.primaryTags });
 
       try {
         const res = await fetch("/api/analyze", {

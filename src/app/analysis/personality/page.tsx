@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Loader2, AlertCircle, ShoppingBag, Sparkles } from "lucide-react";
 import { scorePersonalityAnalysis } from "@/lib/analysis-engine";
 import { products } from "@/lib/products";
+import { tagsToElement, saveElementProfile } from "@/lib/element-profile";
 
 // Big Five soru seti — TIPI-Mini'den uyarlandı (her soru için 5-noktalı Likert ölçeği)
 const QUESTIONS = [
@@ -210,6 +211,9 @@ export default function PersonalityAnalysisPage() {
       setStep("loading");
       const profile = scorePersonalityAnalysis(newAnswers);
       setPersonalityProfile(profile);
+      // 4 Element profilini hesapla ve kaydet
+      const element = tagsToElement(profile.primaryTags, "personality");
+      saveElementProfile({ element, moduleType: "personality", timestamp: Date.now(), primaryTags: profile.primaryTags });
       try {
         const res = await fetch("/api/analyze", {
           method: "POST",

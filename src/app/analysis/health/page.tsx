@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Loader2, AlertCircle, ShoppingBag, Activity } from "lucide-react";
 import { scoreHealthAnalysis } from "@/lib/analysis-engine";
 import { products } from "@/lib/products";
+import { tagsToElement, saveElementProfile } from "@/lib/element-profile";
 
 // Fonksiyonel Tıp Semptom Anketi (MSQ) — 4 soru, her sistem için 1 temel ölçüm
 const QUESTIONS = [
@@ -193,6 +194,9 @@ export default function HealthAnalysisPage() {
       setStep("loading");
       const profile = scoreHealthAnalysis(newAnswers);
       setHealthProfile(profile);
+      // 4 Element profilini hesapla ve kaydet
+      const element = tagsToElement(profile.primaryTags, "health");
+      saveElementProfile({ element, moduleType: "health", timestamp: Date.now(), primaryTags: profile.primaryTags });
       try {
         const res = await fetch("/api/analyze", {
           method: "POST",
