@@ -82,7 +82,7 @@ export default function Home() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "2rem" }}>
           
-          <Link href="/analysis" style={{ textDecoration: "none" }}>
+          <Link href="/analysis/health" style={{ textDecoration: "none" }}>
             <motion.div 
               whileHover={{ y: -10, backgroundColor: "rgba(255,255,255,0.1)" }}
               style={{ padding: "3rem", borderRadius: "24px", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
@@ -95,7 +95,7 @@ export default function Home() {
             </motion.div>
           </Link>
 
-          <Link href="/analysis" style={{ textDecoration: "none" }}>
+          <Link href="/analysis/personality" style={{ textDecoration: "none" }}>
             <motion.div 
               whileHover={{ y: -10, backgroundColor: "rgba(255,255,255,0.1)" }}
               style={{ padding: "3rem", borderRadius: "24px", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
@@ -108,7 +108,7 @@ export default function Home() {
             </motion.div>
           </Link>
 
-          <Link href="/analysis" style={{ textDecoration: "none" }}>
+          <Link href="/analysis/skin" style={{ textDecoration: "none" }}>
             <motion.div 
               whileHover={{ y: -10, backgroundColor: "rgba(255,255,255,0.1)" }}
               style={{ padding: "3rem", borderRadius: "24px", backgroundColor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", backdropFilter: "blur(10px)", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}

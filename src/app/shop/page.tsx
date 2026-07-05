@@ -4,62 +4,12 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowLeft, ShoppingBag, Filter, ChevronRight } from "lucide-react";
 import { useState } from "react";
+import { products as mockProducts } from "@/lib/products";
 
-const mockProducts = [
-  { 
-    id: 1, 
-    name: "Saf Lavanta Uçucu Yağı", 
-    category: "Aromaterapi", 
-    price: "245 ₺", 
-    desc: "Fransız Alplerinden elde edilen premium kalite. Sakinleştirici ve rahatlatıcı etkisiyle uyku kalitenizi derinleştirir.",
-    image: "https://images.unsplash.com/photo-1611078816997-7e61f22490cc?w=800&auto=format&fit=crop"
-  },
-  { 
-    id: 2, 
-    name: "Organik Kuşburnu Çekirdeği Yağı", 
-    category: "Cilt Bakımı", 
-    price: "320 ₺", 
-    desc: "A Vitamini deposu. Anti-aging etkisiyle cildi yeniler, ince çizgilerin ve lekelerin görünümünü kusursuzca azaltır.",
-    image: "https://images.unsplash.com/photo-1615397323136-1e35e3962635?w=800&auto=format&fit=crop"
-  },
-  { 
-    id: 3, 
-    name: "Isparta Gül Suyu (Saf Hidrolat)", 
-    category: "Cilt Bakımı", 
-    price: "150 ₺", 
-    desc: "Geleneksel bakır imbiklerde damıtılmış %100 saf gül suyu. Cildin pH dengesini korur, gözenekleri sıkılaştırır.",
-    image: "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?w=800&auto=format&fit=crop"
-  },
-  { 
-    id: 4, 
-    name: "Zencefil & Zerdeçal Eliksiri", 
-    category: "Şifa & Bağışıklık", 
-    price: "185 ₺", 
-    desc: "Kadim Çin Tıbbı formülü. Güçlü bir antioksidan kaynağı olarak hücreleri korur ve bağışıklık sistemini destekler.",
-    image: "https://images.unsplash.com/photo-1596647265882-628d09722ea9?w=800&auto=format&fit=crop"
-  },
-  { 
-    id: 5, 
-    name: "Huzur Ritüeli Bitki Çayı", 
-    category: "Şifa & Bağışıklık", 
-    price: "120 ₺", 
-    desc: "Organik papatya, melisa ve lavanta içeren özel stres karşıtı harman. Günün yorgunluğunu silmek için ideal.",
-    image: "https://images.unsplash.com/photo-1576092762791-dd9e2220abd4?w=800&auto=format&fit=crop"
-  },
-  { 
-    id: 6, 
-    name: "Nane & Okaliptüs Uçucu Yağı", 
-    category: "Aromaterapi", 
-    price: "190 ₺", 
-    desc: "Zihni anında açan, odaklanmayı artıran ve ortamın enerjisini tazeleyen yoğun ferahlık.",
-    image: "https://images.unsplash.com/photo-1582298687702-0e24ec140cfa?w=800&auto=format&fit=crop"
-  },
-];
-
-const categories = ["Tümü", "Cilt Bakımı", "Aromaterapi", "Şifa & Bağışıklık"];
+const categories = ["Tümü", "Cilt Bakımı", "Aromaterapi", "Sağlık & Bağışıklık"];
 
 export default function ShopPage() {
-  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [hoveredProduct, setHoveredProduct] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState("Tümü");
 
   const filteredProducts = activeCategory === "Tümü" 
