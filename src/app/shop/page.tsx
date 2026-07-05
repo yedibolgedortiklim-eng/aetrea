@@ -87,6 +87,7 @@ export default function ShopPage() {
   const [selectedMood, setSelectedMood] = useState<string>("all");
   const [elementProfile, setElementProfile] = useState<ElementProfile | null>(null);
   const [showElementBanner, setShowElementBanner] = useState(true);
+  const [onlyElementUyumlu, setOnlyElementUyumlu] = useState(true);
   
   // Ambient Sound State
   const [isPlayingSound, setIsPlayingSound] = useState(false);
@@ -128,6 +129,9 @@ export default function ShopPage() {
     setIsPlayingSound(!isPlayingSound);
   };
 
+  const currentElement = elementProfile?.element;
+  const config = currentElement ? elementConfig[currentElement] : null;
+
   // Filtreleme mantığı
   const filteredProducts = products.filter((product) => {
     const matchesCategory = activeCategory === "Tümü" || product.category === activeCategory;
@@ -135,11 +139,24 @@ export default function ShopPage() {
     const matchesMood =
       selectedMood === "all" ||
       product.tags.some((tag) => selectedMoodTags.includes(tag));
-    return matchesCategory && matchesMood;
+    
+    // Eğer element profili varsa ve 'Sadece element uyumlu' seçeneği aktifse
+    const elementTags = config?.moodTags || [];
+    const matchesElement = !elementProfile || !onlyElementUyumlu || product.tags.some((tag) => elementTags.includes(tag));
+
+    return matchesCategory && matchesMood && matchesElement;
   });
 
-  const currentElement = elementProfile?.element;
-  const config = currentElement ? elementConfig[currentElement] : null;
+  // Afinite Skoruna Göre Sırala (Kişisel Mağazada en uyumlular en üstte çıkar)
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (!currentElement) return 0;
+    const elConfig = elementConfig[currentElement];
+    const aMatches = a.tags.some(tag => elConfig.moodTags.includes(tag));
+    const bMatches = b.tags.some(tag => elConfig.moodTags.includes(tag));
+    if (aMatches && !bMatches) return -1;
+    if (!aMatches && bMatches) return 1;
+    return 0;
+  });
 
   // Kozmik Uyum Hesaplama
   const cosmicSynergy = currentElement ? getCosmicSynergy(currentElement) : null;
@@ -287,12 +304,25 @@ export default function ShopPage() {
 
         {/* Başlık */}
         <div style={{ marginBottom: "3rem", textAlign: "center" }}>
-          <h1 style={{ fontSize: "3.2rem", fontWeight: 300, lineHeight: 1.1, marginBottom: "0.5rem" }}>
-            Doğal Eczane & <span style={{ fontWeight: 700, color: "#a8d48a" }}>Şifa Havuzu</span>
-          </h1>
-          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "1.1rem", maxWidth: "600px", margin: "0 auto" }}>
-            aktardepo.com güvencesiyle %100 orijinal, saf ve lisanslı şifa ürünleri.
-          </p>
+          {elementProfile && onlyElementUyumlu && config ? (
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
+              <h1 style={{ fontSize: "3.2rem", fontWeight: 300, lineHeight: 1.1, marginBottom: "0.5rem" }}>
+                {config.icon} {currentElement} Elementi <span style={{ fontWeight: 700, color: "#a8d48a" }}>Kişisel Eczaneniz</span>
+              </h1>
+              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "1.1rem", maxWidth: "700px", margin: "0 auto" }}>
+                En son yaptığınız analize göre element dengenizi korumak için özel seçilen botanik formüller.
+              </p>
+            </motion.div>
+          ) : (
+            <div>
+              <h1 style={{ fontSize: "3.2rem", fontWeight: 300, lineHeight: 1.1, marginBottom: "0.5rem" }}>
+                Doğal Eczane & <span style={{ fontWeight: 700, color: "#a8d48a" }}>Şifa Havuzu</span>
+              </h1>
+              <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "1.1rem", maxWidth: "600px", margin: "0 auto" }}>
+                aktardepo.com güvencesiyle %100 orijinal, saf ve lisanslı şifa ürünleri.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Ruh Hali Seçici (Mood Selector) */}
@@ -435,15 +465,44 @@ export default function ShopPage() {
 
           {/* Ürün Listesi */}
           <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.95rem" }}>
-                Toplam <strong style={{ color: "white" }}>{filteredProducts.length}</strong> şifa ürünü listeleniyor
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "1rem" }}>
+              <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.95rem", margin: 0 }}>
+                Toplam <strong style={{ color: "white" }}>{sortedProducts.length}</strong> {elementProfile && onlyElementUyumlu ? "kişisel element" : "genel"} şifa ürünü listeleniyor
               </p>
+              {elementProfile && (
+                <button
+                  onClick={() => setOnlyElementUyumlu(!onlyElementUyumlu)}
+                  style={{
+                    background: onlyElementUyumlu ? "rgba(201, 164, 74, 0.15)" : "rgba(255,255,255,0.05)",
+                    border: onlyElementUyumlu ? "1px solid #c9a44a" : "1px solid rgba(255,255,255,0.15)",
+                    color: onlyElementUyumlu ? "#c9a44a" : "rgba(255,255,255,0.6)",
+                    padding: "0.5rem 1rem",
+                    borderRadius: "20px",
+                    cursor: "pointer",
+                    fontSize: "0.82rem",
+                    fontWeight: "bold",
+                    transition: "all 0.3s",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem"
+                  }}
+                >
+                  {onlyElementUyumlu ? (
+                    <>
+                      <Sparkles size={14} /> Kişisel Eczanem (Açık)
+                    </>
+                  ) : (
+                    <>
+                      🔍 Tüm Mağazayı Göster
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
             <motion.div layout style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "2rem" }}>
               <AnimatePresence mode="popLayout">
-                {filteredProducts.map((product) => {
+                {sortedProducts.map((product) => {
                   const activeMoodTags = moods[selectedMood]?.tags || [];
                   
                   // Element Afinite Skoru (Uyum Skoru) Hesaplama

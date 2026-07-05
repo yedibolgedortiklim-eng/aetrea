@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Loader2, AlertCircle, ShoppingBag, Activity } from "lucide-react";
 import { scoreHealthAnalysis } from "@/lib/analysis-engine";
 import { products } from "@/lib/products";
-import { tagsToElement, saveElementProfile } from "@/lib/element-profile";
+import { tagsToElement, saveElementProfile, elementConfig } from "@/lib/element-profile";
 
 // Fonksiyonel Tıp Semptom Anketi (MSQ) — 4 soru, her sistem için 1 temel ölçüm
 const QUESTIONS = [
@@ -159,9 +159,38 @@ function ResultCard({ result, healthProfile }: { result: any; healthProfile: any
         </div>
       )}
 
+      {/* 4 Element Uyum Kartı */}
+      {(() => {
+        const element = tagsToElement(healthProfile.primaryTags, "health");
+        const config = element ? elementConfig[element] : null;
+        if (!config || !element) return null;
+
+        return (
+          <div style={{
+            background: config.gradient,
+            border: `1px solid ${config.color}88`,
+            borderRadius: "24px",
+            padding: "2rem",
+            marginBottom: "2.5rem",
+            textAlign: "center",
+            boxShadow: "0 15px 35px rgba(0,0,0,0.3)"
+          }}>
+            <span style={{ fontSize: "3.5rem", display: "block", marginBottom: "0.5rem" }}>{config.icon}</span>
+            <p style={{ color: "#c9a44a", fontSize: "0.8rem", letterSpacing: "0.2em", marginBottom: "0.4rem" }}>DOMİNANT ELEMENTİNİZ</p>
+            <h3 style={{ fontSize: "1.8rem", fontWeight: 700, color: "white", marginBottom: "0.5rem" }}>{element} Elementi</h3>
+            <p style={{ color: "rgba(255,255,255,0.9)", fontSize: "0.95rem", lineHeight: 1.6, marginBottom: "1.2rem" }}>
+              {config.description}
+            </p>
+            <div style={{ fontStyle: "italic", color: "rgba(255,255,255,0.7)", fontSize: "0.85rem" }}>
+              "{config.mantra}"
+            </div>
+          </div>
+        );
+      })()}
+
       <div style={{ display: "flex", gap: "1rem" }}>
         <Link href="/shop" style={{ flex: 1, textAlign: "center", background: "linear-gradient(135deg, #8b4513 0%, #c96f2a 100%)", color: "white", padding: "1rem 2rem", borderRadius: "30px", textDecoration: "none", fontWeight: 700, fontSize: "1rem" }}>
-          Tüm Ürünleri Gör
+          Kişisel Şifa Eczaneme Git →
         </Link>
         <Link href="/analysis" style={{ flex: 1, textAlign: "center", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.8)", padding: "1rem 2rem", borderRadius: "30px", textDecoration: "none", fontWeight: 600, fontSize: "1rem", border: "1px solid rgba(255,255,255,0.15)" }}>
           Başka Analiz Yap
