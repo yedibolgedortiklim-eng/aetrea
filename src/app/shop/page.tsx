@@ -148,6 +148,14 @@ export default function ShopPage() {
   // Ambient Sound State
   const [isPlayingSound, setIsPlayingSound] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Chat otomatik aşağı kaydırma
+  useEffect(() => {
+    if (isChatOpen && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, isChatOpen]);
 
   // localStorage okuması
   useEffect(() => {
@@ -908,6 +916,7 @@ export default function ShopPage() {
                     </div>
                   </div>
                 )}
+                <div ref={chatEndRef} />
               </div>
 
               {/* Chat Input Form */}
